@@ -1,3 +1,69 @@
+
+class secureLogs {
+    #spawnLogs;
+    #verifiedLogs;
+    #logsTimer;
+    constructor() {
+        this.#spawnLogs = [];
+        this.#verifiedLogs = [];
+        this.#logsTimer = null;
+    }
+    createLog(r, c, intended, obj, luck) {
+        if (obj.stack.includes("main.js") && luck < 23) {
+            if (mine[r][c] == "⬜") {
+                this.#spawnLogs.push([r, c, intended]);
+            }
+        } 
+    }
+    verifyLog(r, c) {
+        for (let i = 0; i < this.#spawnLogs.length; i++) {
+            if (this.#spawnLogs[i][0] == r && this.#spawnLogs[i][1] == c) {
+                if (mine[r][c] == this.#spawnLogs[i][2]) {
+                    this.#spawnLogs.splice(i, 1);
+                    this.#verifiedLogs.push([mine[r][c], [r, c], new Date(), false, "Normal"]);
+                    break;
+                }
+            }
+        }
+        
+    }
+    verifyFind(block, r, c, variant) {
+        for (let i = 0; i < this.#verifiedLogs.length; i++) {
+            if (this.#verifiedLogs[i][1][0] == r && this.#verifiedLogs[i][1][1] == c) {
+                if (block == this.#verifiedLogs[i][0]) {
+                    this.#verifiedLogs[i][3] = true;
+                    this.#verifiedLogs[i][4] = variant;
+                    break;
+                }
+            }
+        }
+    }
+    showLogs() {
+        if (document.getElementById("dataExport").style.display == "block") {
+                clearInterval(this.#logsTimer);
+                this.#logsTimer = null;
+                let element = document.createElement("p");
+                element.id = "generatedLogs";
+                document.getElementById("logHolder").appendChild(element);
+                let output = "";
+                for (let i = 0; i < this.#verifiedLogs.length; i++) {
+                    output += this.#verifiedLogs[i][0] + this.#verifiedLogs[i][2] + this.#verifiedLogs[i][3] + ", " + this.#verifiedLogs[i][4] +"<br>";
+                }
+                this.#logsTimer = setInterval(this.#reloadLogs, 50, output);
+        } else {
+            clearInterval(this.#logsTimer);
+            this.#logsTimer = null;
+            if (document.getElementById("generatedLogs") != null) {
+                document.getElementById("generatedLogs").remove();
+            }
+        }
+        
+    }
+    #reloadLogs(output) {
+        document.getElementById("generatedLogs").innerHTML = output;
+    }
+
+}
 let mine = [];
 let curX = 1000000000;
 let curY = 0;
@@ -22,8 +88,8 @@ let pickaxes = [
     [">:C", false],
     ["IM HERE NOW TOO", false]
 ];
-let gears = [true, true, true, true, true];
-let currentPickaxe = 9;
+let gears = [false, false, false, false, false];
+let currentPickaxe = 0;
 let oreList = {
     "🐱" : [1/Infinity, [0,0,0,0]],
     "🌳" : [1/9250000000, [0,0,0,0]],
@@ -679,6 +745,7 @@ function displayArea() {
                 generated = generateBlock(luck, [y, x-1]);
                 mine[y][x - 1] = generated[0];
                 if (generated[1]) {
+                    verifiedOres.verifyLog(y, x-1);
                 }
                 blocksRevealedThisReset++;
             }
@@ -687,7 +754,7 @@ function displayArea() {
             generated = generateBlock(luck, [y, x+1]);
                 mine[y][x + 1] = generated[0];
                 if (generated[1]) {
-                    
+                    verifiedOres.verifyLog(y, x+1);
                 }
                 blocksRevealedThisReset++;
             }
@@ -695,6 +762,7 @@ function displayArea() {
             generated = generateBlock(luck, [y+1, x]);
                 mine[y + 1][x] = generated[0];
                 if (generated[1]) {
+                    verifiedOres.verifyLog(y+1, x);
                 }
                 blocksRevealedThisReset++;
             }
@@ -704,6 +772,7 @@ function displayArea() {
                 generated = generateBlock(luck, [y-1, x]);
                 mine[y - 1][x] = generated[0];
                 if (generated[1]) {
+                    verifiedOres.verifyLog(y-1, x);
                 }
                 blocksRevealedThisReset++;
             }
@@ -731,6 +800,9 @@ function giveBlock(type, x, y, fromReset) {
     
     if (type != "⛏️") {
         inv = 1;
+        if (type == "🟩") {
+            type = "🟫";
+        }   
         if (Math.floor(Math.random() * 50) == 25) {
                 inv = 2;
             } else if (Math.floor(Math.random() * 250) == 125) {
@@ -738,11 +810,17 @@ function giveBlock(type, x, y, fromReset) {
             }   else if (Math.floor(Math.random() * 500) == 250) {
                 inv = 4;
             }
-        if (type == "🟩") {
-                type = "🟫";
-        }   
+            if (Math.round(1 / (oreList[type][0])) >= 160000000) {
+                verifiedOres.verifyFind(mine[y][x], y, x, names[inv - 1]);
+            }
             if (Math.round(1/oreList[type][0]) >= 750000) {
-                logFind(type, x, y, names[inv - 1], totalMined, fromReset);
+                if (currentPickaxe >= 7) {
+                    if (Math.round(1/oreList[type][0]) > 2000000) {
+                        logFind(type, x, y, names[inv - 1], totalMined, fromReset);
+                    } 
+                } else {
+                    logFind(type, x, y, names[inv - 1], totalMined, fromReset);
+                }
             }
             oreList[type][1][inv - 1]++;
             updateInventory(type, inv);
@@ -763,18 +841,18 @@ function generateBlock(luck, location) {
         }
         }
         if (Math.round(1 / (probabilityTable[blockToGive])) > 5000000000) {
-            
-            hasLog = false;
+            verifiedOres.createLog(location[0],location[1],blockToGive, new Error(), luck);
+            hasLog = true;
             spawnMessage(blockToGive, location);
             playSound("zenith");
         } else if (Math.round(1 / (probabilityTable[blockToGive])) > 750000000) {
-            
-            hasLog = false;
+            verifiedOres.createLog(location[0],location[1],blockToGive, new Error(), luck);
+            hasLog = true;
             spawnMessage(blockToGive, location);
             playSound("otherworldly");
-        } else if (Math.round(1 / (probabilityTable[blockToGive])) >= 124100000){
-       
-            hasLog = false;
+        } else if (Math.round(1 / (probabilityTable[blockToGive])) >= 160000000){
+            verifiedOres.createLog(location[0],location[1],blockToGive, new Error(), luck);
+            hasLog = true;
             spawnMessage(blockToGive, location);
             playSound("unfathomable");
         } else if (Math.round(1 / (probabilityTable[blockToGive])) >= 25000000) {
@@ -828,6 +906,7 @@ function resetMine() {
     currentLayer = allLayers[0];
     createMine();
     mineCapacity = 40000;
+    document.getElementById("mineResetProgress").innerHTML = blocksRevealedThisReset + "/" + mineCapacity + " Blocks Revealed This Reset";
 }
 
 function playSound(type) {
@@ -900,7 +979,7 @@ function loadContent() {
 
   let loopTimer = null;
   let curDirection = "";
-  let miningSpeed = 0.01;
+  let miningSpeed = 0;
   function goDirection(direction) {
     if (curDirection == direction) {
         clearInterval(loopTimer);
@@ -908,7 +987,7 @@ function loadContent() {
     } else {
         clearInterval(loopTimer);
         if (gears[2]) {
-            miningSpeed = 0.0001;
+            miningSpeed = 0;
         }
         loopTimer = setInterval(movePlayer, miningSpeed, direction);
         curDirection = direction;
@@ -1009,11 +1088,20 @@ function spawnMessage(block, location) {
     spawnOre = setTimeout(() => {
         document.getElementById("spawnMessage").innerHTML = "Spawn Messages Appear Here!"
       }, 20000);
+    if (blocksRevealedThisReset > mineCapacity - 5000) {
+        mineCapacity += 5000;
+    }
 }
-function moveOne(dir) {
+function moveOne(dir, button) {
+    button.disabled = true;
     clearInterval(loopTimer);
+    setTimeout(() => {
     movePlayer(dir);
+    }, 15);
     curDirection = "";
+    setTimeout(() => {
+    button.disabled = false;
+    }, 100);
 }
 
 async function mineReset() {
@@ -1229,6 +1317,7 @@ function toggleMusic() {
     }
 }
 
+let verifiedOres = new secureLogs();
 
 
 
