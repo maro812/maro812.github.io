@@ -1092,17 +1092,12 @@ function spawnMessage(block, location) {
         mineCapacity += 5000;
     }
 }
-function moveOne(dir, button) {
-    button.disabled = true;
+function moveOne(dir) {
     clearInterval(loopTimer);
-    setTimeout(() => {
     movePlayer(dir);
-    }, 15);
     curDirection = "";
-    setTimeout(() => {
-    button.disabled = false;
-    }, 100);
 }
+
 
 async function mineReset() {
     mineCapacity = 40000;
