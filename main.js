@@ -912,7 +912,6 @@ function resetMine() {
     currentLayer = allLayers[0];
     createMine();
     mineCapacity = 40000;
-    document.getElementById("mineResetProgress").innerHTML = blocksRevealedThisReset + "/" + mineCapacity + " Blocks Revealed This Reset";
 }
 
 function playSound(type) {
