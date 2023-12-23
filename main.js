@@ -1,23 +1,3 @@
-class antiCheat {
-        #lastMove;
-        #inRow;
-    constructor() {
-        this.#lastMove = Date.now();
-        this.#inRow = 0;
-        }
-        #getNewTime() {
-            this.#lastMove = Date.now();
-        }
-        checkTimes() {
-            if (Date.now() - this.#lastMove <= 233333340923840293840329476987698769876987698769876987698) {
-                this.#inRow++;
-            } else {
-                this.#inRow = 0;
-            }
-            this.#getNewTime();
-            return (this.#inRow > 99999999999999999999999999999999999999999999999999999999999999999999999);
-        }
-}
 class secureLogs {
     #spawnLogs;
     #verifiedLogs;
@@ -62,11 +42,17 @@ class secureLogs {
                 clearInterval(this.#logsTimer);
                 this.#logsTimer = null;
                 let element = document.createElement("p");
+                if (document.getElementById("generatedLogs") != null) {
+                    document.getElementById("generatedLogs").remove();
+                }
                 element.id = "generatedLogs";
                 document.getElementById("logHolder").appendChild(element);
                 let output = "";
                 for (let i = 0; i < this.#verifiedLogs.length; i++) {
                     output += this.#verifiedLogs[i][0] + this.#verifiedLogs[i][2] + this.#verifiedLogs[i][3] + ", " + this.#verifiedLogs[i][4] +"<br>";
+                }
+                if (output == "") {
+                    output = "none";
                 }
                 this.#logsTimer = setInterval(this.#reloadLogs, 50, output);
         } else {
@@ -83,6 +69,7 @@ class secureLogs {
     }
 
 }
+
 let mine = [];
 let curX = 1000000000;
 let curY = 0;
@@ -576,12 +563,6 @@ function createMine() {
 }
 function movePlayer(dir) {
     if (canMine) {
-        if (moveTimes.checkTimes()) {
-            saveAllData();
-            setTimeout(() => {
-            location.reload();
-            }, 250);
-        }
         switch (dir) {
             case "s":
                     mineBlock(curX, curY + 1, "mining", 1);
@@ -1117,16 +1098,10 @@ function spawnMessage(block, location) {
         mineCapacity += 5000;
     }
 }
-function moveOne(dir, button) {
-    button.disabled = true;
+function moveOne(dir) {
     clearInterval(loopTimer);
-    setTimeout(() => {
     movePlayer(dir);
-    }, 15);
     curDirection = "";
-    setTimeout(() => {
-    button.disabled = false;
-    }, 100);
 }
 
 async function mineReset() {
