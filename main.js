@@ -9,13 +9,13 @@ class antiCheat {
             this.#lastMove = Date.now();
         }
         checkTimes() {
-            if (Date.now() - this.#lastMove <= 0) {
+            if (Date.now() - this.#lastMove <= 233333340923840293840329476987698769876987698769876987698) {
                 this.#inRow++;
             } else {
                 this.#inRow = 0;
             }
             this.#getNewTime();
-            return (this.#inRow > 10);
+            return (this.#inRow > 99999999999999999999999999999999999999999999999999999999999999999999999);
         }
 }
 class secureLogs {
