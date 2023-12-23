@@ -1094,9 +1094,6 @@ function spawnMessage(block, location) {
     spawnOre = setTimeout(() => {
         document.getElementById("spawnMessage").innerHTML = "Spawn Messages Appear Here!"
       }, 20000);
-    if (blocksRevealedThisReset > mineCapacity - 5000) {
-        mineCapacity += 5000;
-    }
 }
 function moveOne(dir) {
     clearInterval(loopTimer);
