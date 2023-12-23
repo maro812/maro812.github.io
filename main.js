@@ -9,7 +9,7 @@ class antiCheat {
             this.#lastMove = Date.now();
         }
         checkTimes() {
-            if (Date.now() - this.#lastMove <= 500000000000000) {
+            if (Date.now() - this.#lastMove <= 0) {
                 this.#inRow++;
             } else {
                 this.#inRow = 0;

@@ -1,7 +1,7 @@
 async function rollAbilities() {
-    let boost = 200;
+    let boost = 20;
     if (gears[1]) {
-        boost = 250;
+        boost = 30;
     }
     switch (currentPickaxe) {
         case 1:
