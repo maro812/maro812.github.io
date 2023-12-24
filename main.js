@@ -850,7 +850,7 @@ function generateBlock(luck, location) {
             hasLog = true;
             spawnMessage(blockToGive, location);
             playSound("otherworldly");
-        } else if (Math.round(1 / (probabilityTable[blockToGive])) >= 160000000){
+        } else if (Math.round(1 / (probabilityTable[blockToGive])) >= 124500000){
             verifiedOres.createLog(location[0],location[1],blockToGive, new Error(), luck);
             hasLog = true;
             spawnMessage(blockToGive, location);
@@ -1092,12 +1092,14 @@ function spawnMessage(block, location) {
         mineCapacity += 5000;
     }
 }
-function moveOne(dir) {
+function moveOne(dir, button) {
+    function moveOne(dir) {
     clearInterval(loopTimer);
     movePlayer(dir);
     curDirection = "";
 }
 
+}
 
 async function mineReset() {
     mineCapacity = 40000;
