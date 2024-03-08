@@ -1028,7 +1028,7 @@ function createIndex() {
     for (let i = 0; i < allLayers.length - 1; i++) {
         for (var propertyName in allLayers[i]) {
             num = (Math.round(1/(oreList[propertyName][0])));
-            if (num > 2000000 && num < 5000000000) {
+            if (num > 2000000 && num < 5000000000000) {
                 output += propertyName + " | 1/" + (Math.round(1/(oreList[propertyName][0]))).toLocaleString() + " | " + (i * 2000) + "-" + ((i+1) * 2000) + "m<br>";
             }
         }
